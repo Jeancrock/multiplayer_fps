@@ -1,0 +1,106 @@
+# Blender MTL File: 'doomguy&shotgun.blend'
+# Material Count: 9
+
+newmtl None
+Ns 500
+Ka 0.8 0.8 0.8
+Kd 0.8 0.8 0.8
+Ks 0.8 0.8 0.8
+d 1
+illum 2
+
+newmtl bottom_armor_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-_n62c_ci/bottom_armor_mat_Normal.png
+map_Kd /tmp/gltfimg-ltfyxoo2/bottom_armor_mat_BaseColor.jpg
+
+newmtl doom_supershotgun.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-8nqesex0/doom_supershotgun_doom_supershotgun_Normal.png
+map_Kd /tmp/gltfimg-5ghq3omz/doom_supershotgun_doom_supershotgun_BaseColor.png
+
+newmtl eye_and_tooth_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-cr8mztrm/eye_and_tooth_mat_Normal.png
+map_Kd /tmp/gltfimg-1te104_n/eye_and_tooth_mat_BaseColor.jpg
+
+newmtl hair_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_d /tmp/gltfimg-s6b00ber/hair_mat_Alpha.png
+
+newmtl head_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-9kuga0kb/head_mat_Normal.png
+map_Kd /tmp/gltfimg-9iy_n2ac/head_mat_BaseColor.jpg
+
+newmtl helm_and_gun_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-lz44dxon/helm_and_gun_mat_Normal.png
+map_Kd /tmp/gltfimg-yy42zaiq/helm_and_gun_mat_BaseColor-helm_and_gun_mat_Alpha.jpg.png
+map_d /tmp/gltfimg-yy42zaiq/helm_and_gun_mat_BaseColor-helm_and_gun_mat_Alpha.jpg.png
+
+newmtl main_armor_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-ehom6yow/main_armor_mat_Normal.png
+map_Kd /tmp/gltfimg-lxbglbn0/main_armor_mat_BaseColor.jpg
+
+newmtl top_details_mat.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump /tmp/gltfimg-rmyio6eg/top_details_mat_Normal.png
+map_Kd /tmp/gltfimg-g4rxynsj/top_details_mat_BaseColor.jpg
