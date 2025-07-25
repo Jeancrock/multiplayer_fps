@@ -1,25 +1,22 @@
 use std::collections::HashMap;
 
 use bevy::{
-    ecs::{component::Component, entity::Entity, event::Event, system::Resource},
+    ecs::{component::Component, entity::Entity, system::Resource},
     math::{Quat, Vec3},
 };
 use renet::ClientId;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub enum ClientMessage {
-    PlayerMove([f32; 3]),
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum ServerMessage {
-    LobbySync(HashMap<ClientId, PlayerAttributes>),
     PlayerJoin(ClientId),
     PlayerLeave(ClientId),
+    LobbySync(HashMap<ClientId, PlayerAttributes>),
+    PlayerHit {
+        new_health: f32,
+        client_id: ClientId,
+    },
 }
-#[derive(Resource)]
-pub struct ServerPlayerRegistry(pub HashMap<ClientId, PlayerAttributes>);
 
 #[derive(Eq, Hash, PartialEq, Copy, Clone, Debug, Serialize, Deserialize)]
 pub enum Weapon {
@@ -28,12 +25,6 @@ pub enum Weapon {
     Gatling,
     RocketLauncher,
     Bfg,
-}
-
-#[derive(Event)]
-pub struct PlayerHitEvent {
-    pub victim_id: ClientId,
-    pub damage: f32,
 }
 
 impl std::fmt::Display for Weapon {
@@ -55,15 +46,16 @@ pub struct PlayerShoot {
     pub to: Vec3,
 }
 
-
 #[derive(Component)]
 pub struct PlayerStats {
+    pub username: String,
     pub health: f32,
     pub armor: f32,
     pub owned_weapon: HashMap<Weapon, bool>,
     pub actual_weapon: Weapon,
     pub ammo: HashMap<Weapon, f32>,
 }
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerSync {
     pub position: (f32, f32, f32),
@@ -85,8 +77,9 @@ pub struct ShotFiredMessage {
 #[derive(Component, Debug)]
 pub struct PlayerEntity(pub ClientId);
 
-#[derive(Component, PartialEq)]
+#[derive(Debug, Component, PartialEq)]
 pub struct Player {
+    pub username: String,
     pub position: (f32, f32, f32),
     pub rotation: Quat,
     pub health: f32,
@@ -123,7 +116,8 @@ impl Default for PlayerLobby {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PlayerAttributes {
-    pub position: [f32; 3],
+    pub username: String,
+    pub position: (f32, f32, f32),
     pub rotation: Quat,
     pub health: f32,
     pub armor: f32,
@@ -143,79 +137,3 @@ impl PlayerAttributes {
         *self.owned_weapon.get(weapon).unwrap_or(&false)
     }
 }
-
-// pub fn gunEntity(mut commands: Commands, asset_server: Res<AssetServer>) -> Entity {
-//     let gun_model = asset_server.load("models/gun2.glb#Scene0");
-//     let gun_entity = commands
-//         .spawn(SceneBundle {
-//             scene: gun_model,
-//             transform: Transform::IDENTITY,
-//             visibility: Visibility::Hidden,
-//             ..Default::default()
-//         })
-//         .id();
-//     return gun_entity;
-// }
-
-// pub fn shotgunEntity(mut commands: Commands, asset_server: Res<AssetServer>) -> Entity {
-//     let shotgun_model = asset_server.load("models/shotgun2.glb#Scene0");
-//     let shotgun_entity = commands
-//         .spawn(SceneBundle {
-//             scene: shotgun_model,
-//             transform: Transform::IDENTITY,
-//             visibility: Visibility::Hidden,
-//             ..Default::default()
-//         })
-//         .id();
-//     return shotgun_entity;
-// }
-
-// pub fn gatlingEntity(mut commands: Commands, asset_server: Res<AssetServer>) -> Entity {
-//     let gatling_model = asset_server.load("models/minigun.glb#Scene0");
-//     let gatling_entity = commands
-//         .spawn(SceneBundle {
-//             scene: gatling_model,
-//             transform: Transform::IDENTITY,
-//             visibility: Visibility::Hidden,
-//             ..Default::default()
-//         })
-//         .id();
-//     return gatling_entity;
-// }
-
-// pub fn rocketEntity(mut commands: Commands, asset_server: Res<AssetServer>) -> Entity {
-//     let rocket_launcher_model = asset_server.load("models/rocket.glb#Scene0");
-//     let rocket_launcher_entity = commands
-//         .spawn(SceneBundle {
-//             scene: rocket_launcher_model,
-//             transform: Transform::IDENTITY,
-//             visibility: Visibility::Hidden,
-//             ..Default::default()
-//         })
-//         .id();
-//     return rocket_launcher_entity;
-// }
-
-// pub fn bfgEntity(mut commands: Commands, asset_server: Res<AssetServer>) -> Entity {
-//     let bfg_model = asset_server.load("models/bfg2.glb#Scene0");
-//     let bfg_entity = commands
-//         .spawn(SceneBundle {
-//             scene: bfg_model,
-//             transform: Transform::IDENTITY,
-//             visibility: Visibility::Hidden,
-//             ..Default::default()
-//         })
-//         .id();
-//     return bfg_entity;
-// }
-
-// #[derive(Resource, Clone)]
-// pub struct GunEntity(pub Entity);
-// #[derive(Resource, Clone)]
-// pub struct ShotgunEntity(pub Entity);
-// #[derive(Resource, Clone)]
-// pub struct GatlingEntity(pub Entity);
-// #[derive(Resource, Clone)]
-// pub struct RocketEntity(pub Entity);
-// #[derive(Resource, Clone)]
-// pub struct BfgEntity(pub Entity);

@@ -1,4 +1,4 @@
-use crate::game::player::{player::SkyCubeMap, player_shooting::Shootable};
+use crate::{game::player::player_shooting::Shootable, resources::SkyCubeMap};
 use bevy::{
     asset::LoadState,
     core_pipeline::Skybox,
@@ -15,25 +15,11 @@ use super::targets;
 
 pub struct LevelPlugin;
 
-#[derive(Resource)]
-pub struct SpawnSpots{
-    pub spots : Vec<Transform>
-}
-
-impl Default for SpawnSpots {
-    fn default() -> Self {
-        SpawnSpots {
-            spots: Vec::new(), // ou une valeur par défaut de ton choix
-        }
-    }
-}
-
-
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         // Assurez-vous de ne pas ajouter de plugins par défaut manuellement
         app.add_plugins(targets::TargetsPlugin)
-        .insert_resource(SpawnSpots::default())
+        // .insert_resource(SpawnSpots::default())
         .add_systems(Startup, init_level);
     }
 }
@@ -101,18 +87,6 @@ commands.spawn((
     },
     Shootable,
 ));
-
-    // let sky_model = asset_server.load("models/sky2.glb#Scene0");
-
-    // // Ajouter le sol avec le maillage personnalisé et le matériau transparent
-    // commands.spawn({
-    //     SceneBundle {
-    //         scene: sky_model,
-    //         transform: Transform::IDENTITY,
-    //         visibility: Visibility::Visible,
-    //         ..default()
-    //     }
-    // });
 
     // Définir la grille du labyrinthe (1 = mur, 0 = chemin)
     let maze_grid = vec![
@@ -249,6 +223,7 @@ pub fn reinterpret_cubemap(
     mut cubemap: ResMut<SkyCubeMap>, // Modifier cubemap pour être mutable
     mut skyboxes: Query<&mut Skybox>,
 ) {
+    
     // Vérifier si l'image est chargée et que cubemap.loaded est encore false
     if !cubemap.loaded && asset_server.load_state(&cubemap.image) == LoadState::Loaded {
         // Récupérer l'image et vérifier si elle est sous la bonne forme

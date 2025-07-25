@@ -7,12 +7,12 @@ use rngs::ThreadRng;
 
 use crate::game::player::player_shooting::Shootable;
 
-use super::level::*;
-
 pub struct TargetsPlugin;
 impl Plugin for TargetsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (update_targets, reinterpret_cubemap))
+        app.add_systems(Update, (update_targets,
+            //  reinterpret_cubemap
+            ))
             .add_systems(Startup, init_grid_shot);
     }
 }

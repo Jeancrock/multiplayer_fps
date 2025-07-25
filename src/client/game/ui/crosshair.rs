@@ -1,6 +1,14 @@
 use bevy::prelude::*;
 
 pub fn spawn_crosshair(mut commands: Commands) {
+    commands.spawn(Camera2dBundle {
+        camera: Camera {
+            order: 1, // rend après la caméra 3D
+            ..default()
+        },
+        ..default()
+    });
+
     let crosshair_size = 2.0;
 
     commands
@@ -12,7 +20,7 @@ pub fn spawn_crosshair(mut commands: Commands) {
                 align_items: AlignItems::Center,         // Centrage vertical
                 ..default()
             },
-            inherited_visibility:InheritedVisibility::VISIBLE,
+            inherited_visibility: InheritedVisibility::VISIBLE,
             ..default()
         })
         .with_children(|parent| {
@@ -23,7 +31,7 @@ pub fn spawn_crosshair(mut commands: Commands) {
                     height: Val::Px(crosshair_size),
                     ..default()
                 },
-                inherited_visibility:InheritedVisibility::VISIBLE,
+                inherited_visibility: InheritedVisibility::VISIBLE,
                 ..default()
             });
         });

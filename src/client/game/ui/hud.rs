@@ -3,8 +3,10 @@ use bevy::{
     prelude::*,
     window::PrimaryWindow,
 };
-use multiplayer_demo::{Player, Weapon};
+use multiplayer_demo::{Player, PlayerLobby, Weapon};
 use rand::Rng;
+
+use crate::resources::MyClientId;
 
 #[derive(Resource)]
 pub struct HeadUpdateTimer(Timer);
@@ -242,7 +244,7 @@ pub fn setup_hud_ui(
                                 ..default()
                             },
                             inherited_visibility: InheritedVisibility::VISIBLE,
-                            image: UiImage::new(asset_server.load("textures/100head1.png")), // Charge l'image
+                            image: UiImage::default(), // Charge l'image
                             ..default()
                         })
                         .insert(PlayerHead);
@@ -484,49 +486,35 @@ pub fn update_game_time_ui(time: Res<Time>, mut query: Query<&mut Text, With<Gam
 }
 
 pub fn update_player_health_ui(
-    player_query: Query<&Player, Changed<Player>>, 
     mut text_query: Query<&mut Text, With<PlayerLifeText>>,
+    lobby: Res<PlayerLobby>,
+    my_id: Res<MyClientId>,
 ) {
-    if let Some(player) = player_query.iter().next() {
+    if let Some(attr) = lobby.0.get(&my_id.0) {
         for mut text in text_query.iter_mut() {
-            text.sections[0].value = format!("{:.0}%", player.health);
+            text.sections[0].value = format!("{:.0}%", attr.health);
         }
     }
 }
 
-
-// // Système pour mettre à jour la vie du joueur
-// pub fn update_player_health_ui(
-//     player_query: Query<&Player>, // Récupère la vie du joueur
-//     mut text_query: Query<&mut Text, With<PlayerLifeText>>, // Texte de la vie du joueur
-// ) {
-//     // Récupère la vie du joueur (on suppose qu'il n'y a qu'un seul joueur)
-//     if let Some(player) = player_query.iter().next() {
-//         // Mise à jour du texte UI avec la vie actuelle du joueur
-//         for mut text in text_query.iter_mut() {
-//             text.sections[0].value = format!(
-//                 "{:.0}%", // Affiche la vie sans décimales
-//                 player.health
-//             );
-//         }
-//     }
-// }
 // Système pour mettre à jour la vie du joueur
 pub fn update_player_armor_ui(
-    player_query: Query<&Player>, // Récupère la vie du joueur
     mut text_query: Query<&mut Text, With<PlayerArmorText>>, // Texte de la vie du joueur
+    lobby: Res<PlayerLobby>,
+    my_id: Res<MyClientId>,
 ) {
     // Récupère la vie du joueur (on suppose qu'il n'y a qu'un seul joueur)
-    if let Some(player) = player_query.iter().next() {
+    if let Some(attr) = lobby.0.get(&my_id.0) {
         // Mise à jour du texte UI avec la vie actuelle du joueur
         for mut text in text_query.iter_mut() {
             text.sections[0].value = format!(
                 "{:.0}%", // Affiche la vie sans décimales
-                player.armor
+                attr.armor
             );
         }
     }
 }
+
 pub fn update_player_ammo_ui(
     player_query: Query<&Player>, // Récupère le joueur
     mut text_query: Query<&mut Text, With<PlayerAmmoText>>, // Texte des munitions
@@ -644,55 +632,57 @@ fn update_weapon_color_image(
 }
 
 pub fn update_head_backgroung(
-    time: Res<Time>,                      // Le temps pour suivre les mises à jour
-    mut timer: ResMut<HeadUpdateTimer>,   // Le timer qui gère les mises à jour toutes les secondes
-    player_query: Query<&Player>, // Requête pour l'entité du joueur
-    asset_server: Res<AssetServer>,       // Ressource partagée pour charger des assets
+    time: Res<Time>,                    // Le temps pour suivre les mises à jour
+    mut timer: ResMut<HeadUpdateTimer>, // Le timer qui gère les mises à jour toutes les secondes
+    asset_server: Res<AssetServer>,     // Ressource partagée pour charger des assets
     mut image_query: Query<&mut UiImage, With<PlayerHead>>, // Composant pour l'animation du visage
+    lobby: Res<PlayerLobby>,
+    my_id: Res<MyClientId>,
 ) {
     // Avancer le timer
     if timer.0.tick(time.delta()).finished() {
-        let player = player_query.single(); // Assure qu'on récupère un seul joueur
+        if let Some(attr) = lobby.0.get(&my_id.0) {
+            for mut image in image_query.iter_mut() {
+                let head_image = match attr.health {
+                    h if h >= 80.0 => format!("100head1.png"),
+                    h if h < 80.0 && h >= 60.0 => format!("80head2.png"),
+                    h if h < 60.0 && h >= 40.0 => format!("60head2.png"),
+                    h if h < 40.0 && h >= 20.0 => format!("40head2.png"),
+                    h if h == 0.0 => format!("0head.png"),
+                    _ => format!("20head2.png"),
+                };
 
-        for mut image in image_query.iter_mut() {
-            let head_image = match player.health {
-                h if h >= 80.0 => format!("100head1.png"),
-                h if h < 80.0 && h >= 60.0 => format!("80head2.png"),
-                h if h < 60.0 && h >= 40.0 => format!("60head2.png"),
-                h if h < 40.0 && h >= 20.0 => format!("40head2.png"),
-                h if h == 0.0 => format!("0head.png"),
-                _ => format!("20head2.png"),
-            };
-
-            *image = UiImage::new(asset_server.load(format!("textures/{}", head_image)));
+                *image = UiImage::new(asset_server.load(format!("textures/{}", head_image)));
+            }
         }
     }
 }
 
 pub fn update_head(
-    time: Res<Time>,                      // Le temps pour suivre les mises à jour
-    mut timer: ResMut<HeadUpdateTimer>,   // Le timer qui gère les mises à jour toutes les secondes
-    player_query: Query<&Player>, // Requête pour l'entité du joueur
-    asset_server: Res<AssetServer>,       // Ressource partagée pour charger des assets
+    time: Res<Time>,                    // Le temps pour suivre les mises à jour
+    mut timer: ResMut<HeadUpdateTimer>, // Le timer qui gère les mises à jour toutes les secondes
+    asset_server: Res<AssetServer>,     // Ressource partagée pour charger des assets
     mut image_query: Query<&mut UiImage, With<PlayerHead>>, // Composant pour l'animation du visage
+    lobby: Res<PlayerLobby>,
+    my_id: Res<MyClientId>,
 ) {
     // Avancer le timer
     if timer.0.tick(time.delta()).just_finished() {
-        let player = player_query.single(); // Assure qu'on récupère un seul joueur
         let mut rng = rand::thread_rng();
+        if let Some(attr) = lobby.0.get(&my_id.0) {
+            for mut image in image_query.iter_mut() {
+                let random_number = rng.gen_range(1..=3); // Génère un nombre entre 1 et 3
+                let head_image = match attr.health {
+                    h if h >= 80.0 => format!("100head{}.png", random_number),
+                    h if h < 80.0 && h >= 60.0 => format!("80head{}.png", random_number),
+                    h if h < 60.0 && h >= 40.0 => format!("60head{}.png", random_number),
+                    h if h < 40.0 && h >= 20.0 => format!("40head{}.png", random_number),
+                    h if h == 0.0 => format!("0head.png"),
+                    _ => format!("20head{}.png", random_number),
+                };
 
-        for mut image in image_query.iter_mut() {
-            let random_number = rng.gen_range(1..=3); // Génère un nombre entre 1 et 3
-            let head_image = match player.health {
-                h if h >= 80.0 => format!("100head{}.png", random_number),
-                h if h < 80.0 && h >= 60.0 => format!("80head{}.png", random_number),
-                h if h < 60.0 && h >= 40.0 => format!("60head{}.png", random_number),
-                h if h < 40.0 && h >= 20.0 => format!("40head{}.png", random_number),
-                h if h == 0.0 => format!("0head.png"),
-                _ => format!("20head{}.png", random_number),
-            };
-
-            *image = UiImage::new(asset_server.load(format!("textures/{}", head_image)));
+                *image = UiImage::new(asset_server.load(format!("textures/{}", head_image)));
+            }
         }
     }
 }
