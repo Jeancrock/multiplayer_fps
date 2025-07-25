@@ -126,43 +126,19 @@ pub fn handle_player_spawn_event_system(
         info!("Tentative de spawn du joueur : {:?}", client_id);
 
         // ✅ Vérifie que les données du joueur sont bien disponibles
-        if let Some(player_data) = player_lobby.0.get(&client_id) {
-            let spawn_stats = PlayerStats {
-                username: player_data.username.clone(),
-                health: player_data.health,
-                armor: player_data.armor,
-                owned_weapon: player_data.owned_weapon.clone(),
-                actual_weapon: player_data.actual_weapon.clone(),
-                ammo: player_data.ammo.clone(),
-            };
-
-            // ✅ On applique directement la position et rotation correctes
-            let transform = Transform {
-                translation: player_data.position.into(),
-                rotation: player_data.rotation.into(),
+        commands.spawn((
+            SceneBundle {
+                scene: asset_server.load("models/guntest.glb#Scene0"),
+                // transform,
                 ..default()
-            };
+            },
+            // spawn_stats,
+            Collider::cylinder(1.5, 0.5),
+            PlayerEntity(client_id),
+            Shootable,
+        ));
 
-            commands.spawn((
-                SceneBundle {
-                    scene: asset_server.load("models/guntest.glb#Scene0"),
-                    transform,
-                    ..default()
-                },
-                spawn_stats,
-                Collider::cylinder(1.5, 0.5),
-                PlayerEntity(client_id),
-                Shootable,
-            ));
-
-            info!("✅ Joueur {:?} spawné avec succès", client_id);
-        } else {
-            // ❌ Les données ne sont pas encore arrivées (ex: LobbySync pas traité)
-            info!(
-                "⏳ Données manquantes pour client {:?}, spawn reporté.",
-                client_id
-            );
-        }
+        info!("✅ Joueur {:?} spawné avec succès", client_id);
     }
 }
 
@@ -221,7 +197,6 @@ pub fn handle_lobby_sync_event_system(
         is_synced.0 = true;
     }
 }
-
 
 #[derive(Resource, Default, Debug)]
 pub struct SyncState {

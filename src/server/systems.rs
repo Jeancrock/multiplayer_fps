@@ -35,7 +35,6 @@ pub fn receive_message_system(
     mut server: ResMut<RenetServer>,
     mut player_lobby: ResMut<PlayerLobby>,
 ) {
-    println!("{:?}", player_lobby);
     for client_id in server.clients_id() {
         if let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
             if let Some(existing) = player_lobby.0.get_mut(&client_id) {
@@ -148,7 +147,13 @@ pub fn receive_shoot_system(
 
                         if hit {
                             println!("💥 Client {client_id} a touché {victim_id}");
-                            victim_attr.health -= 25.;
+                            match shoot.weapon{
+                                Weapon::Gun => victim_attr.health -= 17.,
+                                Weapon::Shotgun => victim_attr.health -= 28.,
+                                Weapon::Gatling => victim_attr.health -= 8.,
+                                Weapon::RocketLauncher => victim_attr.health -= 400.,
+                                Weapon::Bfg => victim_attr.health -= 800.,
+                            }
 
                             let hit_msg = ServerMessage::PlayerHit {
                                 new_health: victim_attr.health,
