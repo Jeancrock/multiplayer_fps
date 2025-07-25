@@ -80,7 +80,6 @@ pub fn receive_message_system(
                 despawn_events.send(PlayerDespawnEvent(client_id));
             }
             ServerMessage::LobbySync(map) => {
-                println!("{:?}", map);
                 lobby_sync_events.send(LobbySyncEvent(map));
             }
             ServerMessage::PlayerHit {

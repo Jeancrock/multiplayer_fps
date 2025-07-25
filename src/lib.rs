@@ -106,7 +106,7 @@ impl Player {
     }
 }
 
-#[derive(Resource, Clone)]
+#[derive(Debug, Resource, Clone)]
 pub struct PlayerLobby(pub HashMap<ClientId, PlayerAttributes>);
 impl Default for PlayerLobby {
     fn default() -> Self {

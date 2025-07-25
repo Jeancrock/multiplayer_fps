@@ -35,6 +35,7 @@ pub fn receive_message_system(
     mut server: ResMut<RenetServer>,
     mut player_lobby: ResMut<PlayerLobby>,
 ) {
+    println!("{:?}", player_lobby);
     for client_id in server.clients_id() {
         if let Some(message) = server.receive_message(client_id, DefaultChannel::Unreliable) {
             if let Some(existing) = player_lobby.0.get_mut(&client_id) {
@@ -47,10 +48,6 @@ pub fn receive_message_system(
                     existing.actual_weapon = player_update.actual_weapon;
                     existing.ammo = player_update.ammo;
 
-                    println!(
-                        "Updated player {} position: {:?}",
-                        client_id, existing.position
-                    );
                 } else {
                     println!(
                         "Failed to deserialize PlayerAttributes from client {}",
