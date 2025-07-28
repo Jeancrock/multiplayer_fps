@@ -1,5 +1,9 @@
 // src/server/main.rs
 
+use std::collections::HashMap;
+use std::net::UdpSocket;
+use std::time::{Duration, SystemTime};
+
 use bevy::prelude::*;
 use bevy::time::common_conditions::on_timer;
 use bevy::{
@@ -14,11 +18,12 @@ use renet::{
     transport::{NetcodeServerTransport, ServerAuthentication, ServerConfig},
     ConnectionConfig, RenetServer,
 };
+
 use resources::SpawnSpots;
-use std::collections::HashMap;
-use std::net::UdpSocket;
-use std::time::{Duration, SystemTime};
-use systems::{handle_events_system, receive_message_system, receive_shoot_system, send_message_system, setup_system};
+use systems::{
+    handle_events_system, receive_message_system, receive_shoot_system, send_message_system,
+    setup_system,
+};
 
 // Permet au serveur d'écouter sur toutes les interfaces réseau locales
 const SERVER_ADDR: &str = "0.0.0.0:5000";
@@ -36,22 +41,24 @@ pub enum ServerSystemSet {
 fn main() {
     let mut app = App::new();
 
-    // Plugins minimaux (pas besoin du moteur complet Bevy côté serveur)
-    app.add_plugins(MinimalPlugins);
-    app.add_plugins(AssetPlugin::default());
-    app.add_plugins(LogPlugin::default());
-    app.add_plugins(RenetServerPlugin);
-    app.add_plugins(NetcodeServerPlugin);
+    // Plugins essentiels uniquement pour un serveur
+    app.add_plugins((
+        MinimalPlugins,
+        AssetPlugin::default(),
+        LogPlugin::default(),
+        RenetServerPlugin,
+        NetcodeServerPlugin,
+    ));
 
-    // Initialisation du serveur Renet (logique réseau bas niveau)
+    // Configuration du serveur réseau Renet
     let server = RenetServer::new(ConnectionConfig::default());
     app.insert_resource(server);
 
-    // Initialisation des ressources globales (état des joueurs, spawn points, etc.)
+    // Ressources partagées (état des joueurs, points d'apparition, etc.)
     app.insert_resource(PlayerLobby(HashMap::default()));
     app.insert_resource(SpawnSpots::new());
 
-    // Configuration et binding du transport réseau (UDP)
+    // Configuration du transport UDP (Netcode)
     let server_addr = SERVER_ADDR.parse().unwrap();
     let socket = UdpSocket::bind(server_addr).expect("Échec du bind de l'UDP socket");
 
@@ -69,18 +76,19 @@ fn main() {
         .expect("Échec de l'initialisation du transport réseau");
     app.insert_resource(transport);
 
-    // Affichage de l'IP locale pour connexion client facile
+    // Affichage de l'adresse IP locale (utile pour rejoindre depuis un autre PC)
     match local_ip_address::local_ip() {
         Ok(ip) => println!("🌐 IP locale du serveur : {}", ip),
         Err(e) => eprintln!("❌ Erreur IP locale : {}", e),
     }
 
-    // Système de setup au démarrage
+    // Système unique lancé au démarrage
     app.add_systems(Startup, setup_system);
 
-    // Systèmes de jeu à exécuter 60 fois par seconde
+    // Fréquence fixe d'exécution des systèmes serveur
     let fixed_interval = Duration::from_secs_f32(1.0 / 60.0);
 
+    // Ordre logique d'exécution : Events → Receive → Send
     app.configure_sets(
         Update,
         (
@@ -90,29 +98,18 @@ fn main() {
         ),
     );
 
+    // Ajout des systèmes dans leurs phases respectives
     app.add_systems(
         Update,
-        handle_events_system
-            .run_if(on_timer(fixed_interval))
-            .in_set(ServerSystemSet::Events),
+        (
+            handle_events_system.in_set(ServerSystemSet::Events),
+            receive_message_system.in_set(ServerSystemSet::Receive),
+            receive_shoot_system.in_set(ServerSystemSet::Receive),
+            send_message_system.in_set(ServerSystemSet::Send),
+        )
+        .run_if(on_timer(fixed_interval)),
     );
-    app.add_systems(
-        Update,
-        receive_message_system
-            .run_if(on_timer(fixed_interval))
-            .in_set(ServerSystemSet::Receive),
-    );
-    app.add_systems(
-        Update,
-        send_message_system
-            .run_if(on_timer(fixed_interval))
-            .in_set(ServerSystemSet::Send),
-    );
-    app.add_systems(
-        Update,
-        receive_shoot_system
-            .run_if(on_timer(fixed_interval))
-            .in_set(ServerSystemSet::Send),
-    );
+
+    // Démarrage de la boucle serveur
     app.run();
 }

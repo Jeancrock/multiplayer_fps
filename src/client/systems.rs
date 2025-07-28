@@ -119,7 +119,6 @@ pub fn handle_player_spawn_event_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut spawn_events: EventReader<PlayerSpawnEvent>,
-    player_lobby: Res<PlayerLobby>,
 ) {
     for event in spawn_events.read() {
         let client_id = event.0;

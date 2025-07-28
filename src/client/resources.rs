@@ -1,11 +1,8 @@
-
 // src/client/resources.rs
 
 use std::collections::HashSet;
 
-use bevy::{
-    asset::Handle, ecs::system::Resource, render::texture::Image
-};
+use bevy::{asset::Handle, ecs::system::Resource, render::texture::Image};
 use renet::ClientId;
 
 #[derive(Resource)]
@@ -28,6 +25,6 @@ pub struct SkyCubeMap {
     pub image: Handle<Image>,
     pub loaded: bool,
 }
-
-#[derive(Default, Resource)]
+#[allow(dead_code)]
+#[derive(Resource, Default)]
 pub struct SpawnedPlayers(pub HashSet<ClientId>);

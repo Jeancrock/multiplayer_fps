@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy::ui::FocusPolicy;
-use multiplayer_demo::{Player, PlayerLobby};
+use multiplayer_demo::PlayerLobby;
 use renet::ClientId;
 
 use crate::resources::MyClientId;
