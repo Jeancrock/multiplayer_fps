@@ -1,3 +1,5 @@
+// src/client/system.rs
+
 use bevy::{
     app::{App, Plugin, Update},
     asset::AssetServer,
@@ -7,14 +9,13 @@ use bevy::{
         system::{Commands, Query, Res, ResMut, Resource},
     },
     log::info,
+    math::Vec3,
     prelude::default,
     scene::SceneBundle,
     transform::components::Transform,
 };
 use bevy_rapier3d::prelude::Collider;
-use multiplayer_demo::{
-    Player, PlayerAttributes, PlayerEntity, PlayerLobby, PlayerStats, ServerMessage,
-};
+use multiplayer_demo::{PlayerAttributes, PlayerEntity, PlayerLobby, PlayerStats, ServerMessage};
 use renet::{ClientId, DefaultChannel, RenetClient};
 
 use crate::{
@@ -26,7 +27,7 @@ use crate::{
 
 pub fn send_message_system(
     mut client: ResMut<RenetClient>,
-    query: Query<(&Player, &Transform)>,
+    query: Query<(&PlayerAttributes, &Transform)>,
     username: Res<MyUsername>,
 ) {
     if let Ok((player, transform)) = query.get_single() {
@@ -42,58 +43,71 @@ pub fn send_message_system(
             .into(),
             health: player.health,
             armor: player.armor,
+            velocity: player.velocity,
             owned_weapon: player.owned_weapon.clone(),
             actual_weapon: player.actual_weapon,
             ammo: player.ammo.clone(),
+            entities: player.entities.clone(),
         };
 
         let message = bincode::serialize(&player_sync).unwrap();
         client.send_message(DefaultChannel::Unreliable, message);
     }
 }
-
 pub fn receive_message_system(
     mut client: ResMut<RenetClient>,
     mut spawn_events: EventWriter<PlayerSpawnEvent>,
     mut despawn_events: EventWriter<PlayerDespawnEvent>,
     mut lobby_sync_events: EventWriter<LobbySyncEvent>,
     mut sync_state: ResMut<SyncState>,
-    mut player_query: Query<(&mut Player, &Transform)>,
+    my_id: Res<MyClientId>,
+    mut player_query: Query<(&mut PlayerAttributes, &mut Transform)>, // mutable Transform
 ) {
     while let Some(message) = client.receive_message(DefaultChannel::ReliableOrdered) {
-        let server_message: ServerMessage = bincode::deserialize(&message).unwrap();
-
-        match server_message {
-            ServerMessage::PlayerJoin(client_id) => {
-                info!("Client connected: {}", client_id);
-
-                if !sync_state.is_connected {
-                    sync_state.is_connected = true;
-                    sync_state.client_id = Some(client_id);
-                    info!("Client ID enregistré dans SyncState: {:?}", client_id);
+        if let Ok(server_message) = bincode::deserialize::<ServerMessage>(&message) {
+            match server_message {
+                ServerMessage::PlayerJoin(client_id) => {
+                    info!("Client connected: {}", client_id);
+                    if !sync_state.is_connected {
+                        sync_state.is_connected = true;
+                        sync_state.client_id = Some(client_id);
+                        info!("Client ID enregistré dans SyncState: {:?}", client_id);
+                    }
+                    spawn_events.send(PlayerSpawnEvent(client_id));
                 }
-
-                spawn_events.send(PlayerSpawnEvent(client_id));
-            }
-            ServerMessage::PlayerLeave(client_id) => {
-                info!("Client disconnected: {}", client_id);
-                despawn_events.send(PlayerDespawnEvent(client_id));
-            }
-            ServerMessage::LobbySync(map) => {
-                lobby_sync_events.send(LobbySyncEvent(map));
-            }
-            ServerMessage::PlayerHit {
-                new_health,
-                client_id,
-            } => {
-                if let Some(my_id) = sync_state.client_id {
-                    if my_id == client_id {
-                        // Trouve le Player local et applique la nouvelle vie
+                ServerMessage::PlayerLeave(client_id) => {
+                    info!("Client disconnected: {}", client_id);
+                    despawn_events.send(PlayerDespawnEvent(client_id));
+                }
+                ServerMessage::LobbySync(map) => {
+                    lobby_sync_events.send(LobbySyncEvent(map));
+                }
+                ServerMessage::PlayerHit {
+                    new_health,
+                    client_id,
+                } => {
+                    if Some(client_id) == sync_state.client_id {
                         if let Ok((mut player, _)) = player_query.get_single_mut() {
                             player.health = new_health;
                             info!("🔥 Dégât reçu ! Nouvelle vie : {}", new_health);
                         }
                     }
+                }
+                ServerMessage::PlayerDeath {
+                    dead: client_id,
+                    new_position: position,
+                } => {
+                    // Modifier la position si le joueur est celui local (à discuter selon logique)
+                    if my_id.0 == client_id {
+                        if let Ok((mut player, mut transform)) = player_query.get_single_mut() {
+                            player.position = position;
+                            transform.translation =
+                                Vec3::new(position.0, position.1 + 3., position.2);
+                        }
+                    }
+
+                    info!("Mort reçue pour client {}", client_id);
+                    despawn_events.send(PlayerDespawnEvent(client_id));
                 }
             }
         }
@@ -128,10 +142,8 @@ pub fn handle_player_spawn_event_system(
         commands.spawn((
             SceneBundle {
                 scene: asset_server.load("models/guntest.glb#Scene0"),
-                // transform,
                 ..default()
             },
-            // spawn_stats,
             Collider::cylinder(1.5, 0.5),
             PlayerEntity(client_id),
             Shootable,

@@ -2,11 +2,11 @@ use bevy::prelude::*;
 
 use bevy::input::mouse::MouseWheel;
 use bevy::input::mouse::MouseScrollUnit;
-use multiplayer_demo::Player;
+use multiplayer_demo::PlayerAttributes;
 use multiplayer_demo::Weapon;
 
 pub fn switch_weapon(
-    mut player_query: Query<&mut Player>,
+    mut player_query: Query<&mut PlayerAttributes>,
     mut scroll_events: EventReader<MouseWheel>, // Pour détecter les événements de la molette
     query_visibility: Query<&mut Visibility, With<Handle<Scene>>>,
 ) {
@@ -38,7 +38,7 @@ pub fn switch_weapon(
 }
 
 // Fonction qui cherche la prochaine arme disponible
-pub fn get_next_weapon(player: &Player, prev: bool) -> Option<Weapon> {
+pub fn get_next_weapon(player: &PlayerAttributes, prev: bool) -> Option<Weapon> {
     let mut all_weapons = vec![
         Weapon::Gun,
         Weapon::Shotgun,
@@ -76,7 +76,7 @@ pub fn get_next_weapon(player: &Player, prev: bool) -> Option<Weapon> {
 
 // Fonction pour mettre à jour la visibilité des armes du joueur
 pub fn update_weapon_visibility(
-    player: &Player,
+    player: &PlayerAttributes,
     mut query_visibility: Query<&mut Visibility, With<Handle<Scene>>>,
 ) {
     // Parcourt toutes les armes du joueur

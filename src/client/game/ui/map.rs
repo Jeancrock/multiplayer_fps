@@ -80,7 +80,7 @@ pub fn setup_maze_grid(
                                 height: Val::Px(cell_pixel_size),
                                 ..default()
                             },
-                            background_color: BackgroundColor(Color::WHITE),
+                            background_color: BackgroundColor(Color::srgba(1., 1., 1., 0.1)),
                             ..default()
                         },
                         MazeCell,
@@ -126,7 +126,7 @@ pub fn update_player_dots(
             style.bottom = Val::Px(y);
         } else {
             let color = if *client_id == my_id.0 {
-                Color::srgba(0.0, 0.0, 1.0, 1.0) // bleu
+                Color::srgba(0.0, 50.0, 95.0, 1.0) // bleu
             } else {
                 Color::srgba(1.0, 0.0, 0.0, 1.0) // rouge
             };

@@ -5,7 +5,7 @@ use crate::game::{
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_rapier3d::{plugin::RapierContext, prelude::*};
-use multiplayer_demo::{Player, PlayerEntity, PlayerShoot};
+use multiplayer_demo::{PlayerAttributes, PlayerEntity, PlayerShoot};
 use renet::{DefaultChannel, RenetClient};
 
 /// Marqueur pour les entités pouvant être touchées par les tirs (targets, joueurs)
@@ -21,7 +21,7 @@ pub fn update_player(
     mouse_input: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
     rapier_context: Res<RapierContext>,
-    mut player_query: Query<(&mut Player, &mut Transform)>,
+    mut player_query: Query<(&mut PlayerAttributes, &mut Transform)>,
     camera_query: Query<(&Camera, &GlobalTransform), With<CameraController>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mut meshes: ResMut<Assets<Mesh>>,

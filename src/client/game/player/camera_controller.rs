@@ -1,5 +1,5 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
-use multiplayer_demo::Player;
+use multiplayer_demo::PlayerAttributes;
 
 /// Composant contrôlant la caméra FPS
 #[derive(Component)]
@@ -13,7 +13,7 @@ pub struct CameraController {
 pub fn update_camera_controller(
     mut mouse_motion_events: EventReader<MouseMotion>,
     mut camera_query: Query<(&mut CameraController, &mut Transform)>,
-    mut player_query: Query<&mut Player>,
+    mut player_query: Query<&mut PlayerAttributes>,
 ) {
     // Une seule caméra FPS contrôlée
     if let Ok((mut controller, mut transform)) = camera_query.get_single_mut() {

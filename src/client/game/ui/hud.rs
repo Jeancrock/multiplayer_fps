@@ -3,7 +3,7 @@ use bevy::{
     prelude::*,
     window::PrimaryWindow,
 };
-use multiplayer_demo::{Player, PlayerLobby, Weapon};
+use multiplayer_demo::{PlayerAttributes, PlayerLobby, Weapon};
 use rand::Rng;
 
 use crate::resources::MyClientId;
@@ -516,7 +516,7 @@ pub fn update_player_armor_ui(
 }
 
 pub fn update_player_ammo_ui(
-    player_query: Query<&Player>, // Récupère le joueur
+    player_query: Query<&PlayerAttributes>, // Récupère le joueur
     mut text_query: Query<&mut Text, With<PlayerAmmoText>>, // Texte des munitions
 ) {
     // Récupère le joueur (on suppose qu'il n'y a qu'un seul joueur)
@@ -532,7 +532,7 @@ pub fn update_player_ammo_ui(
 }
 
 pub fn update_player_weapon_border_ui(
-    player_query: Query<&Player>,
+    player_query: Query<&PlayerAttributes>,
     mut color_query: Query<(&WeaponUi, &mut BorderColor), With<BorderColorEdit>>,
 ) {
     // Récupère le joueur (on suppose qu'il n'y a qu'un seul joueur)
@@ -554,7 +554,7 @@ pub fn update_player_weapon_border_ui(
     }
 }
 pub fn update_player_weapon_ui(
-    player_query: Query<&Player>,
+    player_query: Query<&PlayerAttributes>,
     mut iu_weapon_query: Query<
         (
             &WeaponUi,
@@ -606,7 +606,7 @@ fn update_weapon_border_color(
 
 /// Met à jour la couleur de fond en fonction de la possession de l'arme
 fn update_weapon_color_image(
-    player: &Player,
+    player: &PlayerAttributes,
     iu_weapon_query: &mut Query<
         (
             &WeaponUi,
@@ -689,7 +689,7 @@ pub fn update_head(
 
 /// Met à jour la couleur de fond en fonction de la possession de l'arme
 fn update_weapon_background_color(
-    player: &Player,
+    player: &PlayerAttributes,
     iu_weapon_query: &mut Query<
         (
             &WeaponUi,
