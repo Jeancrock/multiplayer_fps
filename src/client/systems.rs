@@ -99,10 +99,11 @@ pub fn receive_message_system(
                 } => {
                     // Modifier la position si le joueur est celui local (à discuter selon logique)
                     if my_id.0 == client_id {
-                        if let Ok((mut player, mut transform)) = player_query.get_single_mut() {
-                            player.position = position;
+                        if let Ok((mut _player, mut transform)) = player_query.get_single_mut() {
+                            // player.position = position;
+                            let over_the_ground = 3.;
                             transform.translation =
-                                Vec3::new(position.0, position.1 + 3., position.2);
+                                Vec3::new(position.0, position.1 + over_the_ground, position.2);
                         }
                     }
 

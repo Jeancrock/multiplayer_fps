@@ -226,7 +226,12 @@ pub fn receive_shoot_system(
                         new_position: victim_attr.position,
                     };
                     let death_msg_bytes = bincode::serialize(&death_msg).unwrap();
-                    server.send_message(victim_id, DefaultChannel::ReliableOrdered, death_msg_bytes.clone());                    println!("server player_lobby : {:?}", player_lobby);
+                    server.send_message(
+                        victim_id,
+                        DefaultChannel::ReliableOrdered,
+                        death_msg_bytes.clone(),
+                    );
+                    println!("server player_lobby : {:?}", player_lobby);
                 }
                 should_broadcast_lobby = true;
             }
