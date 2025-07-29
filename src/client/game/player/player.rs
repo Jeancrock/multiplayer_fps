@@ -84,6 +84,7 @@ pub fn try_init_player(
                     brightness: 500.0,
                 },
                 Shootable,
+                InheritedVisibility::VISIBLE,
             ))
             .id();
 
@@ -142,6 +143,7 @@ pub fn try_init_player(
                     ..Default::default()
                 },
                 TracerSpawnSpot,
+                InheritedVisibility::VISIBLE,
             ))
             .id();
 
@@ -172,6 +174,7 @@ pub fn try_init_player(
                         spawn.1 + 3.,
                         spawn.2,
                     )),
+                    inherited_visibility: InheritedVisibility::VISIBLE,
                     ..Default::default()
                 },
                 Collider::cuboid(1., 2., 1.),

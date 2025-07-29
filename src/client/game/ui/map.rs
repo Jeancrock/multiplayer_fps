@@ -78,8 +78,11 @@ pub fn setup_maze_grid(
                                 bottom: Val::Px(py),
                                 width: Val::Px(cell_pixel_size),
                                 height: Val::Px(cell_pixel_size),
+
                                 ..default()
                             },
+                            inherited_visibility: InheritedVisibility::VISIBLE,
+
                             background_color: BackgroundColor(Color::srgba(1., 1., 1., 0.1)),
                             ..default()
                         },
@@ -142,6 +145,7 @@ pub fn update_player_dots(
                             height: Val::Px(3.5),
                             ..default()
                         },
+                        inherited_visibility: InheritedVisibility::VISIBLE,
                         background_color: BackgroundColor(color),
                         focus_policy: FocusPolicy::Pass,
                         ..default()
