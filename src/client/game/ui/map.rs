@@ -65,7 +65,19 @@ pub fn setup_maze_grid(
 
     for (y, row) in maze_map.grid.iter().enumerate() {
         for (x, &cell) in row.iter().enumerate() {
-            if cell == 1 {
+            if cell != 0 {
+                let mut color = BackgroundColor(Color::srgba(1., 1., 1., 0.1));
+
+                // Voir les points de spawn de joueur
+                if cell == 2 {
+                    color = BackgroundColor(Color::srgba(0., 1., 0., 0.));
+                }
+
+                // Voir les points de spawn d'item
+                if cell == 3 {
+                    color = BackgroundColor(Color::srgba(1., 0., 1., 0.));
+                }
+
                 let px = x as f32 * cell_pixel_size;
                 let py = (maze_map.maze_size as f32 - y as f32 - 1.0) * cell_pixel_size;
 
@@ -83,7 +95,7 @@ pub fn setup_maze_grid(
                             },
                             inherited_visibility: InheritedVisibility::VISIBLE,
 
-                            background_color: BackgroundColor(Color::srgba(1., 1., 1., 0.1)),
+                            background_color: color,
                             ..default()
                         },
                         MazeCell,
