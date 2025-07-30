@@ -225,7 +225,7 @@ fn default_player_attributes(spawn: (f32, f32, f32)) -> PlayerAttributes {
         // Initialisation des munitions pour chaque arme
         ammo: HashMap::from([
             // 100 bullets pour une seule arme sur 5 jouables
-            (Weapon::Gun, 100.),
+            (Weapon::Gun, 999.),
             // (Weapon::Gun, 30.),
             (Weapon::Shotgun, 15.),
             (Weapon::Gatling, 50.),

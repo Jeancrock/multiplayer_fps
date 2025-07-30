@@ -1,2 +1,2 @@
 clear
-cargo run --bin client
+cargo run --bin client --release

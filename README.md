@@ -20,28 +20,6 @@ Le projet est divisé en deux parties principales :
 
 ## Installation et configuration
 
-### Prérequis
-
-- Rust (version 2021 ou plus récente)
-- Git LFS pour la gestion des assets volumineux
-
-### Configuration de Git LFS avant de récupérer le répo
-
-```bash
-# Installation de Git LFS
-sudo apt install git-lfs
-
-# Initialisation de Git LFS
-git lfs install
-
-# Pour gérer les fichiers lourds sur git
-git lfs track "fichiers lourds"
-
-# Pour tracker les fichiers lourds
-git add .gitattributes
-git commit -m "Configuration Git LFS"
-```
-
 ### Compilation et exécution après la récupération du répo
 
 ```bash
