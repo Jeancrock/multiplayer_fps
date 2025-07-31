@@ -216,7 +216,7 @@ fn default_player_attributes(spawn: (f32, f32, f32)) -> PlayerAttributes {
         // Initialisation des armes possédées (seulement le pistolet par défaut)
         owned_weapon: HashMap::from([
             (Weapon::Gun, true),
-            (Weapon::Shotgun, false),
+            (Weapon::Shotgun, true),
             (Weapon::Gatling, false),
             (Weapon::RocketLauncher, false),
             (Weapon::Bfg, false),
@@ -225,8 +225,8 @@ fn default_player_attributes(spawn: (f32, f32, f32)) -> PlayerAttributes {
         // Initialisation des munitions pour chaque arme
         ammo: HashMap::from([
             // 100 bullets pour une seule arme sur 5 jouables
-            (Weapon::Gun, 999.),
-            // (Weapon::Gun, 30.),
+            // (Weapon::Gun, 999.),
+            (Weapon::Gun, 30.),
             (Weapon::Shotgun, 15.),
             (Weapon::Gatling, 50.),
             (Weapon::RocketLauncher, 5.),
